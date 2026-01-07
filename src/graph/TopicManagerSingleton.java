@@ -30,7 +30,7 @@ public class TopicManagerSingleton {
 
       public Topic getTopic(String name){
 
-        if(name == null) throw new IllegalArgumentExceptio("Topic name can't be null");
+        if(name == null) throw new IllegalArgumentException("Topic name can't be null");
 
         Topic t = topics.get(name);
 
