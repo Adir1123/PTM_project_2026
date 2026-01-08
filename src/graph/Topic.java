@@ -80,5 +80,13 @@ public class Topic {
 
     }
 
+    public List<Agent> getSubscribers() {
+        return subs;
+    }
+
+    public List<Agent> getPublishers() {
+        return pubs;
+    }  
+
 
 }
