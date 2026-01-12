@@ -35,6 +35,10 @@ and publish results to other Topics, forming a directed computational graph.
 - Generic Agents (PlusAgent, IncAgent)
 - Config lifecycle management (create / close)
 - Preparation for file-based configuration loading
+- Added `PlusAgent` and `IncAgent` (configurable agents using `subs` / `pubs`).
+- Added `GenericConfig` that loads agents from a simple 3-line-per-agent config file using reflection.
+- Added `ParallelAgent` as a no-op Decorator for `Agent` (preparation for PTM2 parallel execution).
+- Updated agents to support dynamic wiring via configuration files.
 
 ## Technologies & Concepts
 - Java
