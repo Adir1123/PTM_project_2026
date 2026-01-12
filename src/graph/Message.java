@@ -31,7 +31,7 @@ public class Message {
 
     }
 
-    private static double toDouble(String text){ // 
+    private static double toDouble(String text){ 
 
         try {
             return Double.parseDouble(text);
