@@ -15,27 +15,15 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
 /**
  * MyHTTPServer is a simple HTTP server implementation for the PTM project.
- * The server runs in its own thread and dispatches client requests to
- * registered Servlets using longest URI prefix matching.
- *
- * Client handling is performed using a fixed-size worker thread pool,
- * according to the project requirements.
- *
- * Developed with the assistance of AI tools and reviewed, tested,
- * and adapted by me.
+ * Runs in its own thread and dispatches client requests to registered Servlets
+ * using longest URI prefix matching. Client handling uses a fixed-size thread pool.
  */
-
-
-
 public class MyHTTPServer extends Thread implements HTTPServer {
 
     private final int port;
     private final int nThreads;
-
-    // key: "GET /publish" , "GET /app/"
     private final Map<String, Servlet> servletMap = new HashMap<>();
 
     private volatile boolean stop = false;
@@ -68,13 +56,12 @@ public class MyHTTPServer extends Thread implements HTTPServer {
 
             while (!stop) {
                 try {
-                    Socket client = serverSocket.accept(); // עד 1 שניה
+                    Socket client = serverSocket.accept();
                     pool.execute(() -> handleClient(client));
                 } catch (SocketTimeoutException ignored) {
                 }
             }
         } catch (IOException ignored) {
-
         }
     }
 
@@ -92,14 +79,12 @@ public class MyHTTPServer extends Thread implements HTTPServer {
                 s.handle(ri, out);
                 out.flush();
             }
-
         } catch (Exception ignored) {
         } finally {
             try { client.close(); } catch (Exception ignored) {}
         }
     }
 
-   
     private Servlet findBestServlet(String httpCommand, String path) {
         if (httpCommand == null) return null;
         if (path == null) path = "";

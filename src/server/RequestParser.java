@@ -3,22 +3,14 @@ package server;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
-
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * RequestParser parses a simplified HTTP request from a BufferedReader
  * and produces a RequestInfo object according to the project specification.
- *
- * The implementation follows the assignment rules for headers, parameters,
- * URI parsing, and content extraction.
- *
- * Developed with the assistance of AI tools and reviewed, tested,
- * and adapted by me.
  */
-
-
-
 public class RequestParser {
 
     public static RequestInfo parseRequest(BufferedReader reader) throws IOException {
@@ -27,14 +19,12 @@ public class RequestParser {
             return new RequestInfo("", "", new String[0], new HashMap<>(), new byte[0]);
         }
 
-        // GET /api/resource?id=123&name=test HTTP/1.1
         String[] first = line.trim().split("\\s+");
         String httpCommand = first.length > 0 ? first[0].trim() : "";
         String uri = first.length > 1 ? first[1].trim() : "";
 
         Map<String, String> params = new HashMap<>();
 
-        // path + query
         String path = uri;
         int q = uri.indexOf('?');
         if (q >= 0) {
@@ -42,15 +32,15 @@ public class RequestParser {
             addQueryParams(uri.substring(q + 1), params);
         }
 
-        String[] uriSegments = splitSegmentsNormal(path); // api, resource
+        String[] uriSegments = splitSegmentsNormal(path);
 
-        // headers until empty line (Content-Length may be wrong -> ignore later anyway)
+        // Skip headers until empty line
         while (true) {
             line = reader.readLine();
             if (line == null || line.isEmpty()) break;
         }
 
-        // optional key=value lines until empty line (filename="...")
+        // Optional key=value lines until empty line
         while (reader.ready()) {
             line = reader.readLine();
             if (line == null || line.isEmpty()) break;
@@ -58,14 +48,13 @@ public class RequestParser {
             int eq = line.indexOf('=');
             if (eq > 0) {
                 String k = line.substring(0, eq).trim();
-                String v = line.substring(eq + 1).trim(); // לא מורידים גרשיים!
+                String v = line.substring(eq + 1).trim();
                 if (!k.isEmpty() && !params.containsKey(k)) {
                     params.put(k, v);
                 }
             }
         }
 
-        // content: lines until empty line OR !ready
         byte[] content = readContentLines(reader);
 
         return new RequestInfo(httpCommand, uri, uriSegments, params, content);
@@ -89,19 +78,15 @@ public class RequestParser {
         }
     }
 
-    // "/api/resource" -> ["api","resource"]
     private static String[] splitSegmentsNormal(String path) {
         if (path == null) return new String[0];
 
         while (path.startsWith("/")) path = path.substring(1);
         if (path.isEmpty()) return new String[0];
 
-        String[] parts = path.split("/");
-        ArrayList<String> list = new ArrayList<>();
-        for (String s : parts) {
-            if (s != null && !s.isEmpty()) list.add(s);
-        }
-        return list.toArray(new String[0]);
+        return Arrays.stream(path.split("/"))
+                .filter(s -> !s.isEmpty())
+                .toArray(String[]::new);
     }
 
     private static byte[] readContentLines(BufferedReader reader) throws IOException {
@@ -110,14 +95,12 @@ public class RequestParser {
         while (reader.ready()) {
             String line = reader.readLine();
             if (line == null || line.isEmpty()) break;
-
-            sb.append(line).append('\n'); // שומר ירידת שורה כמו בטסט
+            sb.append(line).append('\n');
         }
 
         return sb.toString().getBytes(StandardCharsets.UTF_8);
     }
 
-    // RequestInfo given internal class
     public static class RequestInfo {
         private final String httpCommand;
         private final String uri;
